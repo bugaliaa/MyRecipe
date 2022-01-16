@@ -7,6 +7,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,103 +17,162 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.myrecipe.ui.theme.MyRecipeTheme
+import kotlin.math.exp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MyRecipeTheme() {
-                Conversation(messages = SampleData.conversationSample)
+            MyRecipeTheme {
+                MyApp()
             }
         }
     }
 }
 
-data class Message(val author: String, val body: String)
+@Composable
+fun MyApp(names: List<String> = listOf("Sid", "Sheena")){
+    var shouldShowOnboarding by rememberSaveable {
+        mutableStateOf(true)
+    }
+
+    if(shouldShowOnboarding){
+        OnBoardingScreen(onContinueClicked = {shouldShowOnboarding = false})
+    }else{
+        Greetings()
+    }
+}
 
 @Composable
-fun MessageCard(msg: Message){
-    Row {
-        Image(
-            painter = painterResource(id = R.drawable.profile_picture),
-            contentDescription = "Profile Picture",
+fun Greetings(names: List<String> = List(1000){"$it"}){
+    LazyColumn(
+        modifier = Modifier
+            .padding(vertical = 4.dp)
+    ){
+        items(items = names){name ->
+            Greeting(name = name)
+        }
+    }
+
+}
+
+@Composable
+fun Greeting(name: String){
+    Card(
+        backgroundColor = MaterialTheme.colors.primary,
+        modifier = Modifier.padding(vertical = 4.dp, horizontal = 4.dp)
+    ) {
+        CardContent(name)
+    }
+}
+
+@Composable
+fun CardContent(name: String){
+    var expanded by rememberSaveable { mutableStateOf(false)}
+
+    Surface(
+        color = MaterialTheme.colors.primary,
+        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+    ) {
+        Row(
             modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape))
-        Spacer(
-            modifier = Modifier.width(8.dp)
-        )
-        var isExpanded by remember { mutableStateOf(false) }
-        val surfaceColor : Color by animateColorAsState(
-            if (isExpanded) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
-        )
-        Column(
-            modifier = Modifier.clickable { isExpanded = !isExpanded }
+                .padding(24.dp)
+                .animateContentSize(
+                    spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    )
+                )
         ) {
-            Text(
-                text = msg.author,
-                color = MaterialTheme.colors.secondaryVariant,
-                style = MaterialTheme.typography.subtitle1
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Surface(
-                shape = MaterialTheme.shapes.medium,
-                elevation = 1.dp,
-                color = surfaceColor    ,
-                modifier = Modifier.animateContentSize().padding(1.dp)
-            ) {
-                Text(
-                    text = msg.body,
-                    modifier = Modifier.padding(all = 4.dp),
-                    maxLines = if (isExpanded) Int.MAX_VALUE else 1,
-                    style = MaterialTheme.typography.body2
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(12.dp)) {
+                Text(text = "Hello, ")
+                Text(text = name,
+                    style = MaterialTheme.typography.h4.copy(
+                        fontWeight = FontWeight.ExtraBold
+                    ))
+                if(expanded){
+                    Text(
+                        text = ("Composem ipsum color sit lazy, " +
+                                "padding theme elit, sed do bouncy. ").repeat(4)
+                    )
+                }
+            }
+            IconButton(onClick = { expanded = !expanded }) {
+                Icon(
+                    imageVector = if(expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                    contentDescription = if(expanded){
+                        stringResource(id = R.string.show_less)
+                    }else{
+                        stringResource(id = R.string.show_more)
+                    }
                 )
             }
         }
     }
 }
 
-@Preview(name = "Light Mode")
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    showBackground = true,
-    name = "Dark Mode"
-)
-
 @Composable
-fun PreviewMessageCard(){
-    MyRecipeTheme {
-        MessageCard(
-            msg = Message("Sheena", "Pachinko")
-        )
-    }
-}
-
-@Composable
-fun Conversation(messages: List<Message>){
-    LazyColumn{
-        items(messages){message ->
-            MessageCard(message)
+fun OnBoardingScreen(onContinueClicked: () -> Unit){
+    Surface() {
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "Welcome to the app")
+            Button(
+                modifier = Modifier
+                    .padding(vertical = 24.dp),
+                onClick = onContinueClicked
+            ) {
+                Text("Continue")
+            }
         }
     }
 }
 
-@Preview
+@Preview(
+    name = "Light Mode",
+    widthDp = 320,
+    showBackground = true
+)
 @Composable
-fun PreviewConversation(){
-    MyRecipeTheme {
-        Conversation(messages = SampleData.conversationSample)
+fun PreviewGreeting(){
+    MyApp()
+}
+
+@Preview(
+    name = "On Boarding Screen",
+    widthDp = 320,
+    heightDp = 320,
+    showBackground = true
+)
+@Composable
+fun PreviewOnbBoarding(){
+    MyRecipeTheme() {
+        OnBoardingScreen(onContinueClicked = {})
     }
 }
+
+
