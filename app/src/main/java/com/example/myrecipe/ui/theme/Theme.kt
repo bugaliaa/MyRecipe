@@ -8,32 +8,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 private val DarkColorPalette = darkColors(
-        surface = Blue,
-        onSurface = Navy,
-        primary = Navy,
-        onPrimary = Chartreuse
+    surface = Blue,
+    onSurface = Navy,
+    primary = Navy,
+    onPrimary = Chartreuse
 //        primary = Purple200,
 //        primaryVariant = Purple700,
 //        secondary = Teal200
 )
 
 private val LightColorPalette = lightColors(
-        primary = LightBlue,
-        onPrimary = Navy,
-        surface = Blue,
-        onSurface = Color.White
+    primary = LightBlue,
+    onPrimary = Navy,
+    surface = Blue,
+    onSurface = Color.White
 //        primary = Purple500,
 //        primaryVariant = Purple700,
 //        secondary = Teal200
 
-        /* Other default colors to override
-    background = Color.White,
-    surface = Color.White,
-    onPrimary = Color.White,
-    onSecondary = Color.Black,
-    onBackground = Color.Black,
-    onSurface = Color.Black,
-    */
+    /* Other default colors to override
+background = Color.White,
+surface = Color.White,
+onPrimary = Color.White,
+onSecondary = Color.Black,
+onBackground = Color.Black,
+onSurface = Color.Black,
+*/
 )
 
 @Composable
@@ -45,9 +45,11 @@ fun MyRecipeTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composab
     }
 
     MaterialTheme(
-            colors = colors,
-            typography = Typography,
-            shapes = Shapes,
-            content = content
+        colors = colors,
+        typography = Typography,
+        shapes = Shapes,
+        content = content
     )
+
+
 }

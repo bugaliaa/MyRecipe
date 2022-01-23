@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.myrecipe.ui.home_screen.SignInScreen
 import com.example.myrecipe.ui.theme.MyRecipeTheme
 import kotlin.math.exp
 
@@ -41,7 +42,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyRecipeTheme {
-                MyApp()
+                SignInScreen()
             }
         }
     }
